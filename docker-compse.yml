@@ -1,0 +1,10 @@
+version: '3'
+services:
+  webserver:
+    build: .
+    ports:
+      - "8080:80"         # Apache wird über Port 8080 des Hosts erreichbar sein
+      - "21:21"           # FTP Port
+      - "30000-30009:30000-30009"  # Ports für passive FTP-Verbindungen
+    volumes:
+      - ./www:/var/www/html   # Hier kannst du dein Webseitendatenverzeichnis mounten

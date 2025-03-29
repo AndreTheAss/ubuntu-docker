@@ -1,28 +1,19 @@
-FROM ubuntu:20.04
+FROM php:8-apache
 
-ENV DEBIAN_FRONTEND=noninteractive
+# Update und Installation von vsftpd
+RUN apt-get update && apt-get install -y vsftpd && apt-get clean
 
-# Update und Installation der notwendigen Pakete
-RUN apt-get update && \
-    apt-get install -y xfce4 xfce4-terminal xfce4-goodies xrdp sudo openssh-server supervisor && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+# Kopiere die FTP-Server-Konfiguration in das Image
+COPY vsftpd.conf /etc/vsftpd.conf
 
-# SSH konfigurieren: Verzeichnis für den SSH-Daemon erstellen und Port anpassen
-RUN mkdir /var/run/sshd && \
-    sed -i 's/#Port 22/Port 2222/' /etc/ssh/sshd_config
+# Erstelle einen FTP-Benutzer (bitte in der Produktion sichere Zugangsdaten verwenden)
+RUN useradd -m ftpuser && echo "ftpuser:ftp_password" | chpasswd
 
-# Benutzer anlegen (z. B. "docker") und in die sudo-Gruppe aufnehmen
-RUN useradd -m docker && echo "docker:docker" | chpasswd && adduser docker sudo
+# Exponiere die notwendigen Ports: 80 (Apache), 21 (FTP) sowie den Bereich für passive FTP-Verbindungen
+EXPOSE 80 21 30000-30009
 
-# Standard-Desktop (XFCE) für RDP einrichten
-RUN echo "startxfce4" > /home/docker/.xsession && chown docker:docker /home/docker/.xsession
+# Kopiere das Entrypoint-Skript, das beide Dienste startet
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-# Exponierte Ports: 3389 für RDP, 2222 für SSH
-EXPOSE 3389 2222
-
-# Supervisord-Konfiguration kopieren
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-
-# Supervisor startet alle Dienste im Vordergrund
-CMD ["/usr/bin/supervisord", "-n"]
+CMD ["/entrypoint.sh"]
