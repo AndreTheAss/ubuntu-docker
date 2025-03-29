@@ -1,6 +1,3 @@
 #!/bin/bash
-# Starte den FTP-Dienst (vsftpd) im Hintergrund
-service vsftpd start
-
-# Starte Apache im Vordergrund
+/usr/sbin/vsftpd /etc/vsftpd.conf &
 exec apache2-foreground
