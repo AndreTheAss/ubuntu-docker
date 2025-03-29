@@ -13,7 +13,7 @@ RUN useradd -m ftpuser && echo "ftpuser:ftp_password" | chpasswd
 EXPOSE 80 21 30000-30009
 
 # Kopiere das Entrypoint-Skript, das beide Dienste startet
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+COPY entrypoint.sh /usr/local/bin/docker-php-entrypoint/entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-php-entrypoint/entrypoint.sh
 
 CMD ["/entrypoint.sh"]
