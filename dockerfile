@@ -1,6 +1,6 @@
 FROM php:apache
 
-# Update und benötigte Pakete installieren (z. B. unzip für Composer)
+# Update und benötigte Pakete installieren (z. B. unzip und curl)
 RUN apt-get update && apt-get install -y unzip curl
 
 # Composer installieren
@@ -9,11 +9,11 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 # Arbeitsverzeichnis setzen
 WORKDIR /var/www/html
 
-# Composer-Dateien kopieren und Abhängigkeiten installieren
-COPY composer.json composer.lock ./
+# composer.json kopieren und Abhängigkeiten installieren
+COPY composer.json ./
 RUN composer install --no-dev --optimize-autoloader
 
 # Restlichen Quellcode kopieren
 COPY . .
 
-# Apache im Vordergrund starten (normalerweise ist das bereits im php:apache Image konfiguriert)
+# Apache startet standardmäßig im Vordergrund (im php:apache Image bereits konfiguriert)
