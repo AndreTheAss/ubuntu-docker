@@ -6,7 +6,7 @@ services:
       dockerfile: Dockerfile
     container_name: apache-php
     ports:
-      - "80:80"
+      - "81:80"
     volumes:
       - www_data:/var/www/html
     restart: always
