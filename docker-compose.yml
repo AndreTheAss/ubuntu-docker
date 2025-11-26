@@ -1,4 +1,5 @@
 version: "3.8"
+
 services:
   apache-php:
     build:
@@ -7,18 +8,26 @@ services:
     container_name: apache-php
     ports:
       - "81:80"
+    environment:
+      WORDPRESS_DB_HOST: mariadb:3306
+      WORDPRESS_DB_NAME: rolandrauten
+      WORDPRESS_DB_USER: andre
+      WORDPRESS_DB_PASSWORD: Anfdre212Anfdre212
     volumes:
       - www_data:/var/www/html
+    depends_on:
+      - mariadb
     restart: always
 
   mariadb:
-    image: mariadb:latest
+    image: mariadb:10.11
     container_name: mariadb
     environment:
       MYSQL_ROOT_PASSWORD: Anfdre212Anfdre212
       MYSQL_DATABASE: rolandrauten
       MYSQL_USER: andre
       MYSQL_PASSWORD: Anfdre212Anfdre212
+    command: --max_allowed_packet=512M --innodb-log-file-size=256M
     volumes:
       - db_data:/var/lib/mysql
     restart: always
