@@ -1,22 +1,19 @@
-FROM php:apache
+FROM php:8.2-apache
 
-# Update und benötigte Pakete installieren (z. B. unzip, curl) und PHP-Erweiterungen, wie pdo_mysql
+# Apache Rewrite aktivieren (für Permalinks)
+RUN a2enmod rewrite
+
+# PHP Extensions installieren
 RUN apt-get update && apt-get install -y \
+    libpng-dev \
+    libjpeg62-turbo-dev \
+    libfreetype6-dev \
+    libzip-dev \
+    libicu-dev \
+    zip \
     unzip \
-    curl \
-    && docker-php-ext-install pdo_mysql
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd mysqli pdo pdo_mysql zip intl opcache
 
-# Composer installieren
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-# Arbeitsverzeichnis setzen
+# Dokumentroot korrekt setzen
 WORKDIR /var/www/html
-
-# composer.json kopieren und Abhängigkeiten installieren
-COPY composer.json ./
-RUN composer install --no-dev --optimize-autoloader
-
-# Restlichen Quellcode kopieren
-COPY . .
-
-# Apache startet standardmäßig im Vordergrund (im php:apache Image bereits konfiguriert)
