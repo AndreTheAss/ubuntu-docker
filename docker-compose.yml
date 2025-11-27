@@ -17,6 +17,8 @@ services:
       - www_data:/var/www/html
     depends_on:
       - mariadb
+    networks:
+      - npm_default
     restart: always
 
   mariadb:
@@ -30,6 +32,8 @@ services:
     command: --max_allowed_packet=512M --innodb-log-file-size=256M
     volumes:
       - db_data:/var/lib/mysql
+    networks:
+      - npm_default
     restart: always
 
   phpmyadmin:
@@ -42,6 +46,8 @@ services:
       - "8080:80"
     depends_on:
       - mariadb
+    networks:
+      - npm_default
     restart: always
 
   sftp:
@@ -53,8 +59,14 @@ services:
       - www_data:/home/andre/web
     environment:
       SFTP_USERS: "andre:Anfdre212Anfdre212:1001:1001:web"
+    networks:
+      - npm_default
     restart: always
 
 volumes:
   www_data:
   db_data:
+
+networks:
+  npm_default:
+    external: true
