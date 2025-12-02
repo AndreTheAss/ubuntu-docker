@@ -4,7 +4,6 @@ services:
   apache-php:
     build:
       context: .
-      dockerfile: Dockerfile
     container_name: apache-php
     ports:
       - "81:80"
@@ -50,20 +49,29 @@ services:
       - npm_default
     restart: always
 
-  sftp:
-    image: atmoz/sftp
-    container_name: sftp
+  ftp:
+    image: fauria/vsftpd
+    container_name: ftp
+    restart: always
     ports:
-      - "2222:22"
-    volumes:
-      # Wichtig: gleicher Mount wie Apache/WordPress
-      - www_data:/home/andre/html
+      - "2222:21"                   # EXTERN 2222 → INTERN 21
+      - "21000-21010:21000-21010"  # Passive Ports (falls du die ändern willst, sag Bescheid)
     environment:
-      # Benutzer:Passwort:UID:GID:Verzeichnis
-      SFTP_USERS: "andre:Anfdre212Anfdre212:1000:1000:html"
+      FTP_USER: "andre"
+      FTP_PASS: "Anfdre212Anfdre212"
+      PASV_ADDRESS: "0.0.0.0"
+      PASV_MIN_PORT: 21000
+      PASV_MAX_PORT: 21010
+      LOCAL_UMASK: 022
+      FILE_OPEN_MODE: 0666
+      CHOWN_UPLOADS: "YES"
+      CHOWN_UPLOADS_USERNAME: "www-data"
+      LOG_STDOUT: "YES"
+    volumes:
+      - www_data:/home/vsftpd/andre
     networks:
       - npm_default
-    restart: always
+
 
   fix-permissions:
     image: alpine:latest
@@ -73,7 +81,6 @@ services:
       - www_data:/var/www/html
     restart: "no"
 
-
 volumes:
   www_data:
   db_data:
@@ -81,5 +88,3 @@ volumes:
 networks:
   npm_default:
     external: true
-
-
