@@ -56,12 +56,27 @@ services:
     ports:
       - "2222:22"
     volumes:
-      - www_data:/home/andre/web
+      # Wichtig: gleicher Mount wie Apache/WordPress
+      - www_data:/home/andre/html
     environment:
-      SFTP_USERS: "andre:Anfdre212Anfdre212:1001:1001:web"
+      # Benutzer:Passwort:UID:GID:Verzeichnis
+      SFTP_USERS: "andre:Anfdre212Anfdre212:1000:1000:html"
     networks:
       - npm_default
     restart: always
+
+  fix-permissions:
+    image: alpine:latest
+    container_name: fix-permissions
+    command: >
+      sh -c "
+        chown -R 1000:1000 /var/www/html &&
+        find /var/www/html -type d -exec chmod 775 {} \; &&
+        find /var/www/html -type f -exec chmod 664 {} \;
+      "
+    volumes:
+      - www_data:/var/www/html
+    restart: "no"
 
 volumes:
   www_data:
