@@ -68,12 +68,7 @@ services:
   fix-permissions:
     image: alpine:latest
     container_name: fix-permissions
-    command: >
-      sh -c "
-        chown -R 1000:1000 /var/www/html &&
-        find /var/www/html -type d -exec chmod 775 {} \; &&
-        find /var/www/html -type f -exec chmod 664 {} \;
-      "
+    command: sh -c "chown -R 1000:1000 /var/www/html && find /var/www/html -type d -exec chmod 775 {} \; && find /var/www/html -type f -exec chmod 664 {} \;"
     volumes:
       - www_data:/var/www/html
     restart: "no"
@@ -85,3 +80,4 @@ volumes:
 networks:
   npm_default:
     external: true
+
